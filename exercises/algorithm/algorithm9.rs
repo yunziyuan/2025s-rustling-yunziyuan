@@ -2,7 +2,7 @@
 	heap
 	This question requires you to implement a binary heap function
 */
-// I AM NOT DONE
+
 
 use std::cmp::Ord;
 use std::default::Default;
@@ -37,7 +37,9 @@ where
     }
 
     pub fn add(&mut self, value: T) {
-        //TODO
+        self.count += 1;
+        self.items.push(value);
+        self.heapify_up(self.count);
     }
 
     fn parent_idx(&self, idx: usize) -> usize {
@@ -57,8 +59,54 @@ where
     }
 
     fn smallest_child_idx(&self, idx: usize) -> usize {
-        //TODO
-		0
+        let left_idx = self.left_child_idx(idx);
+        let right_idx = self.right_child_idx(idx);
+        
+        if right_idx <= self.count {
+            if (self.comparator)(&self.items[left_idx], &self.items[right_idx]) {
+                left_idx
+            } else {
+                right_idx
+            }
+        } else if left_idx <= self.count {
+            left_idx
+        } else {
+            idx
+        }
+    }
+
+    fn heapify_up(&mut self, mut idx: usize) {
+        while idx > 1 {
+            let parent = self.parent_idx(idx);
+            if !(self.comparator)(&self.items[idx], &self.items[parent]) {
+                break;
+            }
+            self.items.swap(idx, parent);
+            idx = parent;
+        }
+    }
+
+    fn heapify_down(&mut self, mut idx: usize) {
+        loop {
+            let left = self.left_child_idx(idx);
+            let right = self.right_child_idx(idx);
+            
+            if left > self.count {
+                break;
+            }
+            
+            let mut swap = left;
+            if right <= self.count && !(self.comparator)(&self.items[left], &self.items[right]) {
+                swap = right;
+            }
+            
+            if !(self.comparator)(&self.items[swap], &self.items[idx]) {
+                break;
+            }
+            
+            self.items.swap(idx, swap);
+            idx = swap;
+        }
     }
 }
 
@@ -79,13 +127,25 @@ where
 
 impl<T> Iterator for Heap<T>
 where
-    T: Default,
+    T: Default + Clone,
 {
     type Item = T;
 
     fn next(&mut self) -> Option<T> {
-        //TODO
-		None
+        if self.is_empty() {
+            None
+        } else {
+            let last_item = self.items.pop().unwrap();
+            self.count -= 1;
+            
+            if self.is_empty() {
+                Some(last_item)
+            } else {
+                let result = std::mem::replace(&mut self.items[1], last_item);
+                self.heapify_down(1);
+                Some(result)
+            }
+        }
     }
 }
 

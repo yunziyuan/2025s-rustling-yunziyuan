@@ -39,11 +39,43 @@ impl Default for Person {
 //    `usize` as the age.
 // If while parsing the age, something goes wrong, then return the default of
 // Person Otherwise, then return an instantiated Person object with the results
+// 其结果需要得到适当处理。
+//
+// 步骤：
+// 1.如果提供的字符串的长度为 0，则返回默认值人。
+// 2.将给定的字符串拆分为其中的逗号。
+// 3.从 split作中提取第一个元素并将其用作名称。
+// 4.如果名称为空，则返回默认值 Person。
+// 5.从 split作中提取另一个元素并将其解析为
+// 'usize' 作为年龄。
+// 如果在解析 age 时出现问题，则返回默认值
+// Person 否则，则返回实例化的 Person 对象及其结果
 
-// I AM NOT DONE
 
 impl From<&str> for Person {
     fn from(s: &str) -> Person {
+        if s.len() == 0 {
+            return Person::default();
+        }
+         // 使用 splitn 限制分割次数为2次
+        let mut split = s.splitn(2,',');
+        let name = split.next().unwrap().trim();
+        if name.len() == 0 {
+            return Person::default();
+        }
+
+
+        let age = match split.next() {
+            Some(age) => age.trim(),
+            None => return Person::default(),
+        };
+
+
+        match age.parse::<usize>() {
+            Ok(age) => Person { name: name.to_string(), age },
+            Err(_) => Person::default(),
+        }
+     
     }
 }
 

@@ -2,7 +2,6 @@
 	single linked list merge
 	This problem requires you to merge two ordered singly linked lists into one ordered singly linked list
 */
-// I AM NOT DONE
 
 use std::fmt::{self, Display, Formatter};
 use std::ptr::NonNull;
@@ -70,13 +69,48 @@ impl<T> LinkedList<T> {
         }
     }
 	pub fn merge(list_a:LinkedList<T>,list_b:LinkedList<T>) -> Self
-	{
-		//TODO
-		Self {
-            length: 0,
-            start: None,
-            end: None,
+    where
+    T: Ord + Clone,
+{
+    let mut merged = LinkedList::new();
+    
+    // 创建两个可变指针，分别指向两个链表的起始节点
+    let mut current_a = list_a.start;
+    let mut current_b = list_b.start;
+    
+    // 当两个链表都还有节点时，比较它们的值并将较小的添加到合并链表
+    while current_a.is_some() && current_b.is_some() {
+        let node_a = unsafe { current_a.unwrap().as_ref() };
+        let node_b = unsafe { current_b.unwrap().as_ref() };
+        
+        if node_a.val <= node_b.val {
+            // 添加链表A的当前节点值到合并链表
+            merged.add(node_a.val.clone());
+            // 移动链表A的指针到下一个节点
+            current_a = node_a.next;
+        } else {
+            // 添加链表B的当前节点值到合并链表
+            merged.add(node_b.val.clone());
+            // 移动链表B的指针到下一个节点
+            current_b = node_b.next;
         }
+    }
+    
+    // 处理链表A中剩余的节点
+    while let Some(ptr) = current_a {
+        let node = unsafe { ptr.as_ref() };
+        merged.add(node.val.clone());
+        current_a = node.next;
+    }
+    
+    // 处理链表B中剩余的节点
+    while let Some(ptr) = current_b {
+        let node = unsafe { ptr.as_ref() };
+        merged.add(node.val.clone());
+        current_b = node.next;
+    }
+    
+    merged
 	}
 }
 
