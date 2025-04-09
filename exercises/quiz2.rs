@@ -25,7 +25,6 @@ pub enum Command {
     Trim,
     Append(usize),
 }
-
 mod my_module {
     use super::Command;
 
